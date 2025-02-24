@@ -1,32 +1,29 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { userServices } from "./users.service";
 import { roleValidationSchema, userValidationSchema } from "./users.validation";
 
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const data = req.body;
-        const validationData = userValidationSchema.parse(data);
-        const result = await userServices.createUserDB(validationData);
+        const zodData = userValidationSchema.parse(data);
+        const result = await userServices.createUserDB(zodData);
+
+        const { password, ...other } = result.toObject()
 
         // send response 
         res.status(200).json({
             success: true,
             message: "User is created Successfully!",
-            data: result,
+            data: other,
         })
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong!",
-            error: error,
-        })
+    } catch (err) {
+        next(err);
     }
-
 }
 
-const getAllUsers = async (req: Request, res: Response) => {
+const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await userServices.getAllUsersDB();
         // send response 
@@ -35,15 +32,11 @@ const getAllUsers = async (req: Request, res: Response) => {
             message: "User are retrieved Successfully!",
             data: result,
         })
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong!",
-            error: error,
-        })
+    } catch (err) {
+        next(err);
     }
 }
-const getSingleUser = async (req: Request, res: Response) => {
+const getSingleUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { userId } = req.params;
         const result = await userServices.getSingleUserDB(userId);
@@ -53,22 +46,16 @@ const getSingleUser = async (req: Request, res: Response) => {
             message: "User are retrieved Successfully!",
             data: result,
         })
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong!",
-            error: error,
-        })
+    } catch (err) {
+        next(err);
     }
 }
 
-const changeRole = async (req: Request, res: Response) => {
+const changeRole = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const { userId } = req.params;
-        const {role} = roleValidationSchema.parse(req.body);
-
-        console.log(userId, role);
+        const { role } = roleValidationSchema.parse(req.body);
 
         const result = await userServices.changeRoleDB(userId, role);
         // send response 
@@ -77,12 +64,8 @@ const changeRole = async (req: Request, res: Response) => {
             message: "Role Change Successfully!",
             data: result,
         })
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong!",
-            error: error,
-        })
+    } catch (err) {
+        next(err);
     }
 
 }
