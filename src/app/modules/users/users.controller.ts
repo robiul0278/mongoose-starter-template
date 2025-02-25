@@ -1,11 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { RequestHandler } from "express";
 import { userServices } from "./users.service";
 import { roleValidationSchema, userValidationSchema } from "./users.validation";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
-const createUser = async (req: Request, res: Response, next: NextFunction) => {
-
+const createUser: RequestHandler = async (req, res, next) => {
     try {
         const data = req.body;
         const zodData = userValidationSchema.parse(data);
@@ -25,7 +24,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+const getAllUsers: RequestHandler = async (req, res, next) => {
     try {
         const result = await userServices.getAllUsersDB();
         // send response 
@@ -39,7 +38,7 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 }
-const getSingleUser = async (req: Request, res: Response, next: NextFunction) => {
+const getSingleUser: RequestHandler = async (req, res, next) => {
     try {
         const { userId } = req.params;
         const result = await userServices.getSingleUserDB(userId);
@@ -55,7 +54,7 @@ const getSingleUser = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
-const changeRole = async (req: Request, res: Response, next: NextFunction) => {
+const changeRole: RequestHandler = async (req, res, next) => {
 
     try {
         const { userId } = req.params;
