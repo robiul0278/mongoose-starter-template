@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { userServices } from "./users.service";
 import { roleValidationSchema, userValidationSchema } from "./users.validation";
-
+import sendResponse from "../../utils/sendResponse";
+import httpStatus from "http-status";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -13,10 +14,11 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
         const { password, ...other } = result.toObject()
 
         // send response 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: "User is created Successfully!",
-            data: other,
+            data: result,
         })
     } catch (err) {
         next(err);
@@ -27,7 +29,8 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await userServices.getAllUsersDB();
         // send response 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: "User are retrieved Successfully!",
             data: result,
@@ -41,7 +44,8 @@ const getSingleUser = async (req: Request, res: Response, next: NextFunction) =>
         const { userId } = req.params;
         const result = await userServices.getSingleUserDB(userId);
         // send response 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: "User are retrieved Successfully!",
             data: result,
@@ -59,7 +63,8 @@ const changeRole = async (req: Request, res: Response, next: NextFunction) => {
 
         const result = await userServices.changeRoleDB(userId, role);
         // send response 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: "Role Change Successfully!",
             data: result,
