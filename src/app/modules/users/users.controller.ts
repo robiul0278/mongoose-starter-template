@@ -3,76 +3,63 @@ import { userServices } from "./users.service";
 import { roleValidationSchema, userValidationSchema } from "./users.validation";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
 
-const createUser: RequestHandler = async (req, res, next) => {
-    try {
-        const data = req.body;
-        const zodData = userValidationSchema.parse(data);
-        const result = await userServices.createUserDB(zodData);
+const createUser: RequestHandler = catchAsync(async (req, res) => {
+    
+   
+    const result = await userServices.createUserDB(req.body);
+    const { password, ...other } = result.toObject()
 
-        const { password, ...other } = result.toObject()
+    // send response 
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "User is created Successfully!",
+        data: other,
+    })
+})
 
-        // send response 
-        sendResponse(res, {
-            statusCode: httpStatus.OK,
-            success: true,
-            message: "User is created Successfully!",
-            data: result,
-        })
-    } catch (err) {
-        next(err);
-    }
-}
+const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
+    
+    const result = await userServices.getAllUsersDB();
+    // send response 
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "User are retrieved Successfully!",
+        data: result,
+    })
 
-const getAllUsers: RequestHandler = async (req, res, next) => {
-    try {
-        const result = await userServices.getAllUsersDB();
-        // send response 
-        sendResponse(res, {
-            statusCode: httpStatus.OK,
-            success: true,
-            message: "User are retrieved Successfully!",
-            data: result,
-        })
-    } catch (err) {
-        next(err);
-    }
-}
-const getSingleUser: RequestHandler = async (req, res, next) => {
-    try {
-        const { userId } = req.params;
-        const result = await userServices.getSingleUserDB(userId);
-        // send response 
-        sendResponse(res, {
-            statusCode: httpStatus.OK,
-            success: true,
-            message: "User are retrieved Successfully!",
-            data: result,
-        })
-    } catch (err) {
-        next(err);
-    }
-}
+})
 
-const changeRole: RequestHandler = async (req, res, next) => {
+const getSingleUser: RequestHandler = catchAsync(async (req, res) => {
+   
+    const { userId } = req.params;
+    const result = await userServices.getSingleUserDB(userId);
+    // send response 
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "User are retrieved Successfully!",
+        data: result,
+    })
+})
 
-    try {
-        const { userId } = req.params;
-        const { role } = roleValidationSchema.parse(req.body);
+const changeRole: RequestHandler = catchAsync(async (req, res) => {
 
-        const result = await userServices.changeRoleDB(userId, role);
-        // send response 
-        sendResponse(res, {
-            statusCode: httpStatus.OK,
-            success: true,
-            message: "Role Change Successfully!",
-            data: result,
-        })
-    } catch (err) {
-        next(err);
-    }
+    const { userId } = req.params;
+    const { role } = req.body;
 
-}
+    const result = await userServices.changeRoleDB(userId, role);
+    // send response 
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Role Change Successfully!",
+        data: result,
+    })
+})
 
 export const userController = {
     createUser,
