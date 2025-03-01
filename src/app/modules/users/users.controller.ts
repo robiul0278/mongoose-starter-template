@@ -1,13 +1,13 @@
 import { RequestHandler } from "express";
 import { userServices } from "./users.service";
 import { roleValidationSchema, userValidationSchema } from "./users.validation";
-import sendResponse from "../../utils/sendResponse";
+import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
-import catchAsync from "../../utils/catchAsync";
+import catchAsync from "../../../shared/catchAsync";
 
 const createUser: RequestHandler = catchAsync(async (req, res) => {
-    
-   
+
+
     const result = await userServices.createUserDB(req.body);
     const { password, ...other } = result.toObject()
 
@@ -21,7 +21,7 @@ const createUser: RequestHandler = catchAsync(async (req, res) => {
 })
 
 const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
-    
+
     const result = await userServices.getAllUsersDB();
     // send response 
     sendResponse(res, {
@@ -34,7 +34,7 @@ const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
 })
 
 const getSingleUser: RequestHandler = catchAsync(async (req, res) => {
-   
+
     const { userId } = req.params;
     const result = await userServices.getSingleUserDB(userId);
     // send response 
