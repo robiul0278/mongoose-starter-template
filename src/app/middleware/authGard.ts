@@ -3,14 +3,16 @@ import httpStatus from "http-status";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 import catchAsync from "../../shared/catchAsync";
-import { TUserRole } from "../modules/auth/auth.interface";
 import AppError from "../errors/AppError";
 import { userModel } from "../modules/auth/auth.model";
+import { TUserRole } from "../modules/auth/auth.interface";
 
 const authGard = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    const token = req.headers.authorization?.split(" ")[1];
+
+    const token = req.headers.authorization;
+
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
     }
@@ -19,7 +21,7 @@ const authGard = (...requiredRoles: TUserRole[]) => {
     const { role, userId } = decoded;
 
     //! checking if the user is exist
-    const user = await userModel.findById({_id: userId});
+    const user = await userModel.findById({ _id: userId });
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "This user is not found !");
     }
@@ -38,11 +40,10 @@ const authGard = (...requiredRoles: TUserRole[]) => {
     // }
 
     if (requiredRoles && !requiredRoles.includes(role)) {
-      throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
+      throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized bro!");
     }
 
     req.user = decoded as JwtPayload & { role: string };
-
     next();
   });
 };

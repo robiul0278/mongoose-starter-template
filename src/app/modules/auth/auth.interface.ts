@@ -1,3 +1,4 @@
+import { USER_ROLE } from "./auth.constant";
 
 export type IRegisterUser = {
     name: string;
@@ -13,9 +14,6 @@ export type ILoginUser = {
     role?: "user" | "admin";
 }
 
-const USER_ROLE = {
-    admin: 'admin',
-    user: 'user'
-  } as const;
+
 
 export type TUserRole = keyof typeof USER_ROLE;
