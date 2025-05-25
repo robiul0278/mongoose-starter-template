@@ -7,8 +7,10 @@ export type IRegisterUser = {
     createdAt?: Date;
 }
 export type ILoginUser = {
+    _id?: string;
     email: string;
     password: string;
+    role?: "user" | "admin";
 }
 
 const USER_ROLE = {

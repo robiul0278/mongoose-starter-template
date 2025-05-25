@@ -17,15 +17,13 @@ const registerUser: RequestHandler = catchAsync(async (req, res) => {
     })
 })
 const loginUser: RequestHandler = catchAsync(async (req, res) => {
-    const result = await userServices.RegisterDB(req.body);
-    const { password, ...other } = result.toObject()
+    const result = await userServices.LoginDB(req.body);
 
-    // send response 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "User login Successfully!",
-        data: other,
+        data: result,
     })
 })
 

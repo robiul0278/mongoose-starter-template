@@ -3,6 +3,8 @@ import { ILoginUser, IRegisterUser } from "./auth.interface";
 import { userModel } from "./auth.model";
 import httpStatus from "http-status";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import config from "../../../config";
 
 const RegisterDB = async (payload: IRegisterUser) => {
     const result = await userModel.create(payload);
@@ -22,7 +24,23 @@ const LoginDB = async (payload: ILoginUser) => {
         throw new AppError(httpStatus.NOT_FOUND, "This password not matched!");
     }
 
-    return {}
+    const jwtPayload = {
+        userId: isUserExists?._id,
+        email: isUserExists?.email,
+        role: isUserExists?.role,
+    }
+
+    const accessToken = jwt.sign(
+        jwtPayload, config.jwt_secret_token,
+        {
+            expiresIn: '7d'
+        }
+    );
+
+    return {
+        accessToken,
+        jwtPayload
+    }
 }
 
 
