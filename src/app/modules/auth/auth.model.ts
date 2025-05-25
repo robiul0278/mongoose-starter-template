@@ -1,9 +1,9 @@
 import { Schema, model } from 'mongoose';
-import { IUser } from './users.interface';
+import { IRegisterUser } from './auth.interface';
 import bcrypt from "bcrypt";
 import config from '../../../config';
 
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema<IRegisterUser>({
     name: {
         type: String,
         required: true,
@@ -19,10 +19,6 @@ const UserSchema = new Schema<IUser>({
         unique: true,
         trim: true,
         lowercase: true
-    },
-    photoURL: {
-        type: String,
-        default: ""
     },
     role: {
         type: String,
@@ -50,4 +46,4 @@ UserSchema.post('save', function (doc, next) {
     next();
 });
 
-export const userModel = model<IUser>("User", UserSchema);
+export const userModel = model<IRegisterUser>("User", UserSchema);
