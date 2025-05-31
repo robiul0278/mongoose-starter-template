@@ -19,6 +19,14 @@ export const refreshTokenValidationSchema = z.object({
   }),
 });
 
+export const forgotPasswordValidationSchema = z.object({
+  body: z.object({
+    email: z.string({
+      required_error: 'User email is required!',
+    })
+  })
+})
+
 // Define the validation schema for the role
 export const roleValidationSchema = z.object({
     body: z.object({

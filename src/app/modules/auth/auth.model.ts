@@ -23,7 +23,6 @@ const UserSchema = new Schema<IRegisterUser>({
     role: {
         type: String,
         enum: ["user", "admin"],
-
         default: "user"
     },
     createdAt: {

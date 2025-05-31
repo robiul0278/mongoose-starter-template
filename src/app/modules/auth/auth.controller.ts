@@ -5,7 +5,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import config from "../../../config";
 
-const registerUser: RequestHandler = catchAsync(async (req, res) => {
+const registerUser = catchAsync(async (req, res) => {
     const result = await authServices.RegisterDB(req.body);
     const { password, ...other } = result.toObject()
 
@@ -17,7 +17,7 @@ const registerUser: RequestHandler = catchAsync(async (req, res) => {
         data: other,
     })
 })
-const loginUser: RequestHandler = catchAsync(async (req, res) => {
+const loginUser = catchAsync(async (req, res) => {
     const result = await authServices.LoginDB(req.body);
     const {refreshToken, ...token} = result;
 
@@ -34,7 +34,7 @@ const loginUser: RequestHandler = catchAsync(async (req, res) => {
     })
 })
 
-const refreshToken: RequestHandler = catchAsync(async (req, res) => {
+const refreshToken = catchAsync(async (req, res) => {
     const {refreshToken} = req.cookies;
     const result = await authServices.refreshToken(refreshToken);
 
@@ -45,10 +45,22 @@ const refreshToken: RequestHandler = catchAsync(async (req, res) => {
         data: result,
     })
 })
+const forgetPassword = catchAsync(async (req, res) => {
+    const {email} = req.body;
+    const result = await authServices.forgetPassword(email);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Reset link generated successfully!",
+        data: result,
+    })
+})
 
 
 export const authController = {
     registerUser,
     loginUser,
     refreshToken,
+    forgetPassword,
 }

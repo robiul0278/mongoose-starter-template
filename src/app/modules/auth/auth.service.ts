@@ -81,11 +81,36 @@ const refreshToken = async (token: string) => {
     }
 }
 
+const forgetPassword = async (email: string) => {
 
+        //! checking if the user is exist
+    const isUserExists = await userModel.findOne({ email });
+
+    if (!isUserExists) {
+        throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
+    }
+
+        // create accessToken 
+    const jwtPayload = {
+        userId: isUserExists?._id,
+        email: isUserExists?.email,
+        role: isUserExists?.role,
+    }
+
+    const resetToken = jwt.sign(
+        jwtPayload, config.jwt_secret_token,
+        {expiresIn: '10m'}
+    );
+
+    const resetUILink = `http://localhost:3000/api/v1?email=${isUserExists.email}&token=${resetToken}`
+
+    console.log(resetUILink);
+}
 
 
 export const authServices = {
     RegisterDB,
     LoginDB,
     refreshToken,
+    forgetPassword
 }
