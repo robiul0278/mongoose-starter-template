@@ -11,6 +11,13 @@ export const userValidationSchema = z.object({
     })
 });
 
+export const refreshTokenValidationSchema = z.object({
+  cookies: z.object({
+    refreshToken: z.string({
+      required_error: 'Refresh token is required',
+    }),
+  }),
+});
 
 // Define the validation schema for the role
 export const roleValidationSchema = z.object({

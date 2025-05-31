@@ -16,7 +16,8 @@ const createProduct: RequestHandler = catchAsync(async (req, res) => {
     })
 })
 const getAllProduct: RequestHandler = catchAsync(async (req, res) => {
-    console.log("Verify", req.user);
+    // console.log("USER", req.user);
+    // console.log("TOKEN", req.cookies);
     const result = await productServices.getAllProductDB();
 
     sendResponse(res, {
