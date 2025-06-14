@@ -14,6 +14,9 @@ export type ILoginUser = {
     role?: "user" | "admin";
 }
 
-
+export type IResetPassword = {
+       email: string;
+    newPassword: string;
+}
 
 export type TUserRole = keyof typeof USER_ROLE;

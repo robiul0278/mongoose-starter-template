@@ -1,17 +1,18 @@
 import AppError from "../../errors/AppError";
-import { ILoginUser, IRegisterUser } from "./auth.interface";
+import { ILoginUser, IRegisterUser, IResetPassword } from "./auth.interface";
 import { userModel } from "./auth.model";
 import httpStatus from "http-status";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../../config";
+import { sendEmail } from "../../../shared/sendEmail";
 
-const RegisterDB = async (payload: IRegisterUser) => {
+const registerDB = async (payload: IRegisterUser) => {
     const result = await userModel.create(payload);
     return result;
 }
 
-const LoginDB = async (payload: ILoginUser) => {
+const loginDB = async (payload: ILoginUser) => {
     const isUserExists = await userModel.findOne({ email: payload?.email });
 
     if (!isUserExists) {
@@ -33,13 +34,13 @@ const LoginDB = async (payload: ILoginUser) => {
 
     const accessToken = jwt.sign(
         jwtPayload, config.jwt_secret_token,
-        {expiresIn: '1d'}
+        { expiresIn: '1d' }
     );
 
     // create refreshToken 
     const refreshToken = jwt.sign(
         jwtPayload, config.jwt_refresh_token,
-        {expiresIn: '30d'}
+        { expiresIn: '30d' }
     );
 
     return {
@@ -52,11 +53,11 @@ const LoginDB = async (payload: ILoginUser) => {
 const refreshToken = async (token: string) => {
 
     if (!token) {
-      throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
+        throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
     }
     //! checking if the given token is valid
     const decoded = jwt.verify(token, config.jwt_refresh_token as string) as JwtPayload;
-    const {userId } = decoded;
+    const { userId } = decoded;
 
     //! checking if the user is exist
     const isUserExists = await userModel.findById({ _id: userId });
@@ -73,7 +74,7 @@ const refreshToken = async (token: string) => {
 
     const accessToken = jwt.sign(
         jwtPayload, config.jwt_secret_token,
-        {expiresIn: '1d'}
+        { expiresIn: '1d' }
     );
 
     return {
@@ -83,14 +84,14 @@ const refreshToken = async (token: string) => {
 
 const forgetPassword = async (email: string) => {
 
-        //! checking if the user is exist
+    //! checking if the user is exist
     const isUserExists = await userModel.findOne({ email });
 
     if (!isUserExists) {
-        throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
+        throw new AppError(httpStatus.NOT_FOUND, "This email is not found!");
     }
 
-        // create accessToken 
+    // create accessToken 
     const jwtPayload = {
         userId: isUserExists?._id,
         email: isUserExists?.email,
@@ -99,18 +100,49 @@ const forgetPassword = async (email: string) => {
 
     const resetToken = jwt.sign(
         jwtPayload, config.jwt_secret_token,
-        {expiresIn: '10m'}
+        { expiresIn: '10m' }
     );
 
-    const resetUILink = `http://localhost:3000/api/v1?email=${isUserExists.email}&token=${resetToken}`
+    const resetUILink = `${config.reset_password_ui_link}/api/v1/auth/reset-password?email=${isUserExists.email}&token=${resetToken}`
 
-    console.log(resetUILink);
+    sendEmail(isUserExists?.email, resetUILink)
+
 }
+
+const resetPassword = async (payload: IResetPassword, token: string) => {
+    const { email, newPassword } = payload;
+
+    const decoded = jwt.verify(token, config.jwt_secret_token as string) as JwtPayload;
+
+    if (!decoded) {
+        throw new AppError(httpStatus.UNAUTHORIZED, "Invalid or expired token.");
+    }
+
+    const user = await userModel.findById(decoded.userId);
+
+    if (!user || user.email !== email) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found with this email!");
+    }
+
+    const hashedPassword = await bcrypt.hash(
+        newPassword,
+        Number(config.bcrypt_salt_rounds)
+    );
+
+    await userModel.findByIdAndUpdate(
+        decoded.userId,
+        { password: hashedPassword },
+        // { new: true } // return updated user
+    );
+
+};
+
 
 
 export const authServices = {
-    RegisterDB,
-    LoginDB,
+    registerDB,
+    loginDB,
     refreshToken,
-    forgetPassword
+    forgetPassword,
+    resetPassword
 }

@@ -1,4 +1,3 @@
-import { RequestHandler } from "express";
 import { authServices } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
@@ -6,7 +5,7 @@ import catchAsync from "../../../shared/catchAsync";
 import config from "../../../config";
 
 const registerUser = catchAsync(async (req, res) => {
-    const result = await authServices.RegisterDB(req.body);
+    const result = await authServices.registerDB(req.body);
     const { password, ...other } = result.toObject()
 
     // send response 
@@ -18,7 +17,7 @@ const registerUser = catchAsync(async (req, res) => {
     })
 })
 const loginUser = catchAsync(async (req, res) => {
-    const result = await authServices.LoginDB(req.body);
+    const result = await authServices.loginDB(req.body);
     const {refreshToken, ...token} = result;
 
     res.cookie("refreshToken", refreshToken,{
@@ -57,10 +56,24 @@ const forgetPassword = catchAsync(async (req, res) => {
     })
 })
 
+const resetPassword = catchAsync(async (req, res) => {
+    const data = req.body;
+    const token = req.headers.authorization as string;
+    const result = await authServices.resetPassword(data, token);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Password reset successfully!",
+        data: result,
+    })
+})
+
 
 export const authController = {
     registerUser,
     loginUser,
     refreshToken,
     forgetPassword,
+    resetPassword,
 }

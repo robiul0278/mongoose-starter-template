@@ -1,7 +1,7 @@
 import express from "express";
 import { authController } from "./auth.controller";
 import validateRequest from "../../middleware/validateRequest";
-import { forgotPasswordValidationSchema, refreshTokenValidationSchema, userValidationSchema } from "./auth.validation";
+import { forgotPasswordValidationSchema, refreshTokenValidationSchema, resetPasswordValidationSchema, userValidationSchema } from "./auth.validation";
 
 const router = express.Router();
 
@@ -27,6 +27,12 @@ router.post(
     '/forget-password', 
     validateRequest(forgotPasswordValidationSchema),
     authController.forgetPassword
+);
+
+router.post(
+    '/reset-password', 
+    validateRequest(resetPasswordValidationSchema),
+    authController.resetPassword
 );
 
 export const authRoutes = router;

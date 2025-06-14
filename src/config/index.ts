@@ -4,8 +4,14 @@ import path from 'path';
 dotenv.config({ path: path.join((process.cwd(), '.env')) });
 
 export default {
+  // DEPLOYMENT 
+  node_env: process.env.NODE_ENV,
+
+  // DATABASE 
   port: process.env.PORT,
   database_url: process.env.DATABASE_URL as string,
+
+  // PASSWORD ROUND 
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
 
   // JWT
@@ -14,5 +20,6 @@ export default {
   jwt_secret_expiration: process.env.JWT_SECRET_EXPIRATION as string,
   jwt_refresh_expiration: process.env.JWT_REFRESH_EXPIRATION,
 
-  node_env: process.env.NODE_ENV,
+  // RESET PASSWORD 
+  reset_password_ui_link: process.env.RESET_PASSWORD_UI_LINK 
 };
