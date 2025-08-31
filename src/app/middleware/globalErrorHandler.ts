@@ -48,7 +48,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
     statusCode = err?.statusCode
     message = err?.message
     errorSources = [{
-      path: "",
+      path:  err?.path as string,
       message: err.message,
     }]
   } else if (err instanceof Error) {

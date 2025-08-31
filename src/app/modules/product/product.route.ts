@@ -1,9 +1,7 @@
 import express from "express";
 import validateRequest from "../../middleware/validateRequest";
-import authGard from "../../middleware/authGard";
 import { productValidationSchema } from "./product.validation";
 import { productController } from "./product.controller";
-import { USER_ROLE } from "../auth/auth.constant";
 
 const router = express.Router();
 
@@ -14,7 +12,6 @@ router.post('/create',
 );
 
 router.get('/', 
-    authGard(USER_ROLE.user),
     productController.getAllProduct
 );
 

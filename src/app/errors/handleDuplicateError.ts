@@ -2,24 +2,24 @@
 import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 
 const handleDuplicateError = (err: any): TGenericErrorResponse => {
-  // Extract value within double quotes using regex
-  const match = err.message.match(/"([^"]*)"/);
+  const statusCode = 400;
 
-  // The extracted value will be in the first capturing group
-  const extractedMessage = match && match[1];
+  // Extract the duplicated field name from Mongo error
+  const duplicatedField = Object.keys(err?.keyPattern || {})[0]; // e.g., "email"
+  const duplicatedValue = err?.keyValue?.[duplicatedField]; // e.g., "robiul@gmail.com"
 
   const errorSources: TErrorSources = [
     {
-      path: '',
-      message: `${extractedMessage} is already exists`,
+      path: duplicatedField || '', // fallback: ''
+      message: duplicatedValue
+        ? `এই ${duplicatedField} ইতোমধ্যে ব্যবহৃত হয়েছে!`
+        : "এই তথ্য ইতোমধ্যে ব্যবহৃত হয়েছে",
     },
   ];
 
-  const statusCode = 400;
-
   return {
     statusCode,
-    message: 'Invalid ID',
+    message: 'Duplicate field error',
     errorSources,
   };
 };
